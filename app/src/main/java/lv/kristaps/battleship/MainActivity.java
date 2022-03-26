@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,11 +15,14 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     GridView gridView;
     static int[] playerMap = new int [100];
+    static int[] computerMap = new int [100];
+    static int[] map = new int [100];
     //static int[] mapIndex = new int [100];
     TextView text;
-    Button button;
+    Button button, buttonPlayer, buttonCPU;
     Adapter adapter;
     int gridIndex;
+    boolean isPlayer = true;
     int[] imageId = {
             R.drawable.blue, //0
             R.drawable.fire_in_water,
@@ -58,22 +62,49 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Generator.populateMap(playerMap);
         Generator.generateMap(playerMap);
+        Generator.populateMap(computerMap);
+        Generator.generateMap(computerMap);
         text = (TextView) findViewById(R.id.label);
         button = (Button) findViewById(R.id.button);
+        buttonPlayer = (Button) findViewById(R.id.buttonPlayer);
+        buttonCPU = (Button) findViewById(R.id.buttonCPU);
         gridView = (GridView)findViewById(R.id.grid_view);
+        buttonPlayer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isPlayer = true;
+                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, imageId);
+                gridView.setAdapter(adapter);
+            }
+        });
+        buttonCPU.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isPlayer = false;
+                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, imageId);
+                gridView.setAdapter(adapter);
+            }
+        });
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Generator.populateMap(playerMap);
                 Generator.generateMap(playerMap);
-
-                adapter = new Adapter(MainActivity.this, playerMap, imageId);
+                Generator.populateMap(computerMap);
+                Generator.generateMap(computerMap);
+                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, imageId);
                 gridView.setAdapter(adapter);
             }
         });
+
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                Toast.makeText(MainActivity.this, "" + playerMap[position], Toast.LENGTH_SHORT).show();
+                if (isPlayer){
+                    map = playerMap;
+                } else {
+                    map = computerMap;
+                }
+                Toast.makeText(MainActivity.this, "" + map[position], Toast.LENGTH_SHORT).show();
 
                 gridIndex = position;//saglabā to vērtību, kas ir pirms šaviena
 //
@@ -83,23 +114,23 @@ public class MainActivity extends AppCompatActivity {
                 //-3 apzīmē aizšautu garām lauku
                 //-1 apzīmē nogrimušu kuģi
                 //99 apzīmē ievainotu kuģi
-                if (playerMap[position] == 1 || playerMap[position] == 0) {
-                    playerMap[position] = -3; // ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
-                }else if(playerMap[position] == -1 || playerMap[position] == 99 || playerMap[position] == -3 ){ //šauj pa lauku, kuram jau ir trāpīts
+                if (map[position] == 1 || map[position] == 0) {
+                    map[position] = -3; // ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
+                }else if(map[position] == -1 || map[position] == 99 || map[position] == -3 ){ //šauj pa lauku, kuram jau ir trāpīts
                     //tad netiek netekas mainīts un atkārtoti var šaut, jo divreiz pa vienu un to pašu lauku nevar šaut
-                }else if (playerMap[position] == 5){ //kuģis grimst
-                    playerMap[position] = -1;
+                }else if (map[position] == 5){ //kuģis grimst
+                    map[position] = -1;
                 }else {
-                    playerMap[position] = 99;
+                    map[position] = 99;
                     //isSunk();
                 }
-                switch (playerMap[position]){
+                switch (map[position]){
                     case 1:
-                        gridIndex = playerMap[position];//saglabā to vērtību, kas bija iepriekš
-                        playerMap[position] = -1;// ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
+                        gridIndex = map[position];//saglabā to vērtību, kas bija iepriekš
+                        map[position] = -1;// ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
                         break;
                     case 45:
-                        playerMap[position] = 99;
+                        map[position] = 99;
                         break;
                     default:
                         //tad netiek netekas mainīts un atkārtoti var šaut, jo divreiz pa vienu un to pašu lauku nevar šaut
@@ -108,6 +139,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 
 }

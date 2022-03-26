@@ -23,7 +23,7 @@ public class Generator {
             }
             if(directionRand == 0) updateMapHorizontal(ship, shipStartPos, map);
             else updateMapVertical(ship, shipStartPos, map);
-            printMap();
+            printMap(map);
         }
     }
 
@@ -128,9 +128,9 @@ public class Generator {
         }
     }
 
-    public static void printMap() {
+    public static void printMap(int[] map) {
         for(int i = 0; i < 100; i++){
-            System.out.print(playerMap[i] + " ");
+            System.out.print(map[i] + " ");
             if(i % 10 == 9) System.out.println();
         }
         System.out.println();

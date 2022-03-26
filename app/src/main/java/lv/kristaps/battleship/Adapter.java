@@ -12,19 +12,29 @@ public class Adapter extends BaseAdapter {
 
     private final Context mContext;
     private final int[] playerMap;
+    private final int[] computerMap;
     private final int[] imageid;
-
+    private final boolean isPlayer;
+    private int[] map;
     // 1
-    public Adapter(Context context, int[] playerMap, int[] Imageid) {
+    public Adapter(Context context, int[] playerMap, int[] computerMap, int[] map, boolean isPlayer, int[] Imageid) {
         this.mContext = context;
         this.playerMap = playerMap;
+        this.computerMap = computerMap;
+        this.isPlayer = isPlayer;
         this.imageid = Imageid;
+        this.map = map;
     }
 
     // 2
     @Override
     public int getCount() {
-        return playerMap.length;
+        if (isPlayer){
+            map = playerMap;
+        } else {
+            map = computerMap;
+        }
+        return map.length;
     }
 
     // 3
@@ -43,7 +53,12 @@ public class Adapter extends BaseAdapter {
 
 
     public boolean isEnabled(int position) {
-        if (playerMap[position] == -3 || playerMap[position] == -1 || playerMap[position] == 99) {
+        if (isPlayer){
+            map = playerMap;
+        } else {
+            map = computerMap;
+        }
+        if (map[position] == -3 || map[position] == -1 || map[position] == 99) {
             return false;
         } else {
             return true;
@@ -62,19 +77,33 @@ public class Adapter extends BaseAdapter {
             mImageView = (ImageView) convertView;
         }
     //    mImageView = showPlayerImages(playerMap,mImageView,position);
-        mImageView = showImages(playerMap,-3,mImageView,imageid[2],position);
-        mImageView = showImages(playerMap,-1,mImageView,imageid[26],position);
-        mImageView = showImages(playerMap,0,mImageView,imageid[0],position);
-        mImageView = showImages(playerMap,1,mImageView,imageid[0],position);
-        mImageView = showImages(playerMap,2,mImageView,imageid[5],position);
-        mImageView = showImages(playerMap,4,mImageView,imageid[7],position);
-        mImageView = showImages(playerMap,5,mImageView,imageid[13],position);
-        mImageView = showImages(playerMap,6,mImageView,imageid[3],position);
-        mImageView = showImages(playerMap,8,mImageView,imageid[9],position);
-        mImageView = showImages(playerMap,45,mImageView,imageid[11],position);
-        mImageView = showImages(playerMap,85,mImageView,imageid[12],position);
-        mImageView = showImages(playerMap,99,mImageView,imageid[1],position);
-
+        if (isPlayer) {
+            mImageView = showImages(playerMap, -3, mImageView, imageid[2], position); // šāviens garām
+            mImageView = showImages(playerMap, -1, mImageView, imageid[26], position); // uzsprāgusi mīna
+            mImageView = showImages(playerMap, 0, mImageView, imageid[0], position); // ūdens
+            mImageView = showImages(playerMap, 1, mImageView, imageid[0], position); // ūdens ap kuģi
+            mImageView = showImages(playerMap, 2, mImageView, imageid[5], position); // kuģa apakšējais gals
+            mImageView = showImages(playerMap, 4, mImageView, imageid[7], position); // kuģa kreisais gals
+            mImageView = showImages(playerMap, 5, mImageView, imageid[13], position); // mīna
+            mImageView = showImages(playerMap, 6, mImageView, imageid[3], position); // kuģa labais gals
+            mImageView = showImages(playerMap, 8, mImageView, imageid[9], position); // kuģa augšējais gals
+            mImageView = showImages(playerMap, 45, mImageView, imageid[11], position); // kuģa vidus horizontāli
+            mImageView = showImages(playerMap, 85, mImageView, imageid[12], position); // kuģa vidus vertikāli
+            mImageView = showImages(playerMap, 99, mImageView, imageid[1], position); // ievainots kuģis
+        } else {
+            mImageView = showImages(computerMap, -3, mImageView, imageid[2], position); // šāviens garām
+            mImageView = showImages(computerMap, -1, mImageView, imageid[26], position); // uzsprāgusi mīna
+            mImageView = showImages(computerMap, 0, mImageView, imageid[0], position); // ūdens
+            mImageView = showImages(computerMap, 1, mImageView, imageid[0], position); // ūdens ap kuģi
+            mImageView = showImages(computerMap, 2, mImageView, imageid[0], position); // kuģa apakšējais gals
+            mImageView = showImages(computerMap, 4, mImageView, imageid[0], position); // kuģa kreisais gals
+            mImageView = showImages(computerMap, 5, mImageView, imageid[0], position); // mīna
+            mImageView = showImages(computerMap, 6, mImageView, imageid[0], position); // kuģa labais gals
+            mImageView = showImages(computerMap, 8, mImageView, imageid[0], position); // kuģa augšējais gals
+            mImageView = showImages(computerMap, 45, mImageView, imageid[0], position); // kuģa vidus horizontāli
+            mImageView = showImages(computerMap, 85, mImageView, imageid[0], position); // kuģa vidus vertikāli
+            mImageView = showImages(computerMap, 99, mImageView, imageid[1], position); // ievainots kuģis
+        }
         return mImageView;
     }
 
