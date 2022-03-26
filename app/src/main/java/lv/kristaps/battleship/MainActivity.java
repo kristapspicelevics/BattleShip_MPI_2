@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     static int[] playerMap = new int [100];
     static int[] computerMap = new int [100];
     static int[] map = new int [100];
+    String funeral = "";
     //static int[] mapIndex = new int [100];
     TextView text;
     Button button, buttonPlayer, buttonCPU;
@@ -114,30 +115,130 @@ public class MainActivity extends AppCompatActivity {
                 //-3 apzīmē aizšautu garām lauku
                 //-1 apzīmē nogrimušu kuģi
                 //99 apzīmē ievainotu kuģi
+//                if (map[position] == 1 || map[position] == 0) {
+//                    map[position] = -3; // ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
+//                }else if(map[position] == -1 || map[position] == 99 || map[position] == -3 ){ //šauj pa lauku, kuram jau ir trāpīts
+//                    //tad netiek netekas mainīts un atkārtoti var šaut, jo divreiz pa vienu un to pašu lauku nevar šaut
+//                }else if (map[position] == 5){ //kuģis grimst
+//                    map[position] = -1;
+//                }else {
+//                    map[position] = 99;
+//                    //isSunk();
+//                }
+//                switch (map[position]){
+//                    case 1:
+//                        gridIndex = map[position];//saglabā to vērtību, kas bija iepriekš
+//                        map[position] = -1;// ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
+//                        break;
+//                    case 45:
+//                        map[position] = 99;
+//                        break;
+//                    default:
+//                        //tad netiek netekas mainīts un atkārtoti var šaut, jo divreiz pa vienu un to pašu lauku nevar šaut
+//                }
                 if (map[position] == 1 || map[position] == 0) {
                     map[position] = -3; // ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
-                }else if(map[position] == -1 || map[position] == 99 || map[position] == -3 ){ //šauj pa lauku, kuram jau ir trāpīts
+//                }else if(playerMap[position] == -1 || playerMap[position] == 99 || playerMap[position] == -3 ){ //šauj pa lauku, kuram jau ir trāpīts
                     //tad netiek netekas mainīts un atkārtoti var šaut, jo divreiz pa vienu un to pašu lauku nevar šaut
                 }else if (map[position] == 5){ //kuģis grimst
                     map[position] = -1;
                 }else {
-                    map[position] = 99;
+                    boolean a = isSunk(position,map);
+                    Toast.makeText(MainActivity.this, "" + a, Toast.LENGTH_SHORT).show();
+                    funeral = "";
                     //isSunk();
-                }
-                switch (map[position]){
-                    case 1:
-                        gridIndex = map[position];//saglabā to vērtību, kas bija iepriekš
-                        map[position] = -1;// ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
-                        break;
-                    case 45:
-                        map[position] = 99;
-                        break;
-                    default:
-                        //tad netiek netekas mainīts un atkārtoti var šaut, jo divreiz pa vienu un to pašu lauku nevar šaut
                 }
                 gridView.setAdapter(adapter);
             }
         });
     }
+    public boolean isSunk(int position, int[] map){
+        int direction = 0;
+        if(map[position] == 4 || map[position] == 45 || map[position] == 6){
+            map[position] = 99;
+            direction = 1;
+            while(true){
+                if(direction == 1) {
+                    if ((position) % 10 == 9) direction = -1;
+                    else if (map[position + direction] == 1 || map[position + direction] == -3)
+                        direction = -1;
+                }
+                if(direction == -1) {
+                    if ((position) % 10 == 0) {
+                        sinkHorizontalShip(position);
+                        return true;
+                    } else if (map[position + direction] == 1 || map[position + direction] == -3) {
+                        sinkHorizontalShip(position);
+                        return true;
+                    }
+                }
+                position = position + direction;
+                funeral = funeral + position + "";
+                if(map[position] == 4 || map[position] == 45 || map[position] == 6 ) return false;
+            }
+        }
+        if(map[position] == 8 || map[position] == 85 || map[position] == 2){
+            map[position] = 99;
+            direction = 10;
+            while(true){
+                if(direction == 10) {
+                    if (position > 89) direction = -10;
+                    else if (map[position + direction] == 1 || map[position + direction] == -3)
+                        direction = -10;
+                }
+                if(direction == -10){
+                    if(position < 10) {
+                        sinkVerticalShip(position);
+                        return true;
+                    } else if (map[position + direction] == 1 || map[position + direction] == -3){
+                        sinkVerticalShip(position);
+                        return true;
+                    }
+                }
+                position = position + direction;
+                if(map[position] == 8 || map[position] == 85 || map[position] == 2 ) return false;
+            }
+        }
+        return true;
+    }
+    public void sinkHorizontalShip(int position){
+        boolean doContinue = true;
+        int direction = 1;
+        while(doContinue == true){
+            map[position] = -1;
+            if(direction == 1) {
+                if ((position) % 10 == 9) direction = -1;
+                else if (map[position + direction] == 1  || map[position + direction] == -3) direction = -1;
+            }
+            if(direction == -1) {
+                if ((position) % 10 == 0) {
+                    doContinue = false;
+                } else if (map[position + direction] == 1 || map[position + direction] == -3) {
+                    doContinue = false;
+                }
+            }
+            position = position + direction;
+        }
+    }
+    public void sinkVerticalShip(int position) {
+        boolean doContinue = true;
+        int direction = 10;
+        while(doContinue == true) {
+            map[position] = -1;
+            if(direction == 10) {
+                if (position > 89) direction = -10;
+                else if (map[position + direction] == 1 || map[position + direction] == -3) direction = -10;
+            }
+            if (direction == -10) {
+                if (position < 10) {
+                    doContinue = false;
+                } else if (map[position + direction] == 1 || map[position + direction] == -3) {
+                    doContinue = false;
+                }
+            }
+            position = position + direction;
+        }
+    }
+
 
 }
