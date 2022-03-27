@@ -78,6 +78,12 @@ public class Adapter extends BaseAdapter {
         }
     //    mImageView = showPlayerImages(playerMap,mImageView,position);
         if (isPlayer) {
+            mImageView = showImages(playerMap, -2, mImageView, imageid[16], position); // kuģa apakšējais gals (nogrimis)
+            mImageView = showImages(playerMap, -4, mImageView, imageid[18], position); // kuģa kreisais gals (nogrimis)
+            mImageView = showImages(playerMap, -6, mImageView, imageid[14], position); // kuģa labais gals (nogrimis)
+            mImageView = showImages(playerMap, -8, mImageView, imageid[20], position); // kuģa augšējais gals (nogrimis)
+            mImageView = showImages(playerMap, -45, mImageView, imageid[22], position); // kuģa vidus horizontāli (nogrimis)
+            mImageView = showImages(playerMap, -85, mImageView, imageid[25], position); // kuģa vidus vertikāli (nogrimis)
             mImageView = showImages(playerMap, -3, mImageView, imageid[2], position); // šāviens garām
             mImageView = showImages(playerMap, -1, mImageView, imageid[26], position); // uzsprāgusi mīna
             mImageView = showImages(playerMap, 0, mImageView, imageid[0], position); // ūdens
@@ -91,6 +97,12 @@ public class Adapter extends BaseAdapter {
             mImageView = showImages(playerMap, 85, mImageView, imageid[12], position); // kuģa vidus vertikāli
             mImageView = showImages(playerMap, 99, mImageView, imageid[1], position); // ievainots kuģis
         } else {
+            mImageView = showImages(computerMap, -2, mImageView, imageid[16], position); // kuģa apakšējais gals (nogrimis)
+            mImageView = showImages(computerMap, -4, mImageView, imageid[18], position); // kuģa kreisais gals (nogrimis)
+            mImageView = showImages(computerMap, -6, mImageView, imageid[14], position); // kuģa labais gals (nogrimis)
+            mImageView = showImages(computerMap, -8, mImageView, imageid[20], position); // kuģa augšējais gals (nogrimis)
+            mImageView = showImages(computerMap, -45, mImageView, imageid[22], position); // kuģa vidus horizontāli (nogrimis)
+            mImageView = showImages(computerMap, -85, mImageView, imageid[25], position); // kuģa vidus vertikāli (nogrimis)
             mImageView = showImages(computerMap, -3, mImageView, imageid[2], position); // šāviens garām
             mImageView = showImages(computerMap, -1, mImageView, imageid[26], position); // uzsprāgusi mīna
             mImageView = showImages(computerMap, 0, mImageView, imageid[0], position); // ūdens
