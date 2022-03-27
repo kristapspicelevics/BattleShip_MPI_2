@@ -3,16 +3,14 @@ package lv.kristaps.battleship;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -57,8 +55,12 @@ public class MainActivity extends AppCompatActivity {
             R.drawable.mina_dead,
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
+
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         playerScoreText = (TextView) findViewById(R.id.player);
@@ -87,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         buttonAlert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //music.start();
                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
                 alertDialog.setTitle("Instructions");
                 alertDialog.setMessage("The purpose of the game is to defeat your opponent's fleet before enemy destroyed your fleet. You can change the layout of your ships by pressing Randomize before the game starts. Attacks can be made by pressing on the playing field. You can take one shot on the opponent's playing field in one move. If the shot is accurate, it can be repeated, but if the shot is inaccurate, the move passes to the opponent's player.");
@@ -145,17 +148,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkIfHit(int[] map, int position){
+        MediaPlayer music = MediaPlayer.create(MainActivity.this, R.raw.gunshot);
+        MediaPlayer music1 = MediaPlayer.create(MainActivity.this, R.raw.water);
         if (map[position] == 1 || map[position] == 0) {
             map[position] = -3; // ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
+            music1.start();//water
             if(!isPlayer){
                 ai.AITurn(playerMap);
             }
         }else if (map[position] == 5){ // trāpa mīnai
             map[position] = -1;
             playerScore++;
+            music.start();//gun
         }else {
             sinkingShip.isSunk(position,map);
             playerScore++;
+            music.start();//gun
         }
         displayScore(playerScore, playerScoreString, playerScoreText);
         displayScore(ai.computerScore, computerScoreString, cpuScoreText);
