@@ -224,6 +224,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         alertDialog.show();
+        buttonStart.setEnabled(true);
+        buttonRandom.setEnabled(true);
     }
 
 }
