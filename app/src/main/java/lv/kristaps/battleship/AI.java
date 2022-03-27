@@ -25,7 +25,7 @@ public class AI {
         if (map[position] == 1 || map[position] == 0) {
             map[position] = -3; // ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
             isTurn = false;
-        }else if (map[position] == 5){ //kuģis grimst
+        }else if (map[position] == 5){ // trāpa mīnai
             map[position] = -1;
             computerScore++;
         }else {
