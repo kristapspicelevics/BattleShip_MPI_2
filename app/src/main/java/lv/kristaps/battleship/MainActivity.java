@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     Button button, buttonPlayer, buttonCPU;
     Adapter adapter;
     SinkingShip sinkingShip;
+    AI ai;
     int gridIndex;
     boolean isPlayer = true;
     int[] imageId = {
@@ -109,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "" + map[position], Toast.LENGTH_SHORT).show();
 
                 gridIndex = position;//saglabā to vērtību, kas ir pirms šaviena
+
+                checkIfHit(map, position);
 //
                 //VAJAG PADOT LĪDZI TO KEYVALUE KAUT KĀ, JO PATREIZ IR PIEEJAMS TIKAI TAS CIPARS, KAS IR
                 //ATTIECĪGAJĀ KVADRANTĀ
@@ -137,21 +140,24 @@ public class MainActivity extends AppCompatActivity {
 //                    default:
 //                        //tad netiek netekas mainīts un atkārtoti var šaut, jo divreiz pa vienu un to pašu lauku nevar šaut
 //                }
-                if (map[position] == 1 || map[position] == 0) {
-                    map[position] = -3; // ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
-//                }else if(playerMap[position] == -1 || playerMap[position] == 99 || playerMap[position] == -3 ){ //šauj pa lauku, kuram jau ir trāpīts
-                    //tad netiek netekas mainīts un atkārtoti var šaut, jo divreiz pa vienu un to pašu lauku nevar šaut
-                }else if (map[position] == 5){ //kuģis grimst
-                    map[position] = -1;
-                }else {
-                    boolean a = sinkingShip.isSunk(position,map);
-                    Toast.makeText(MainActivity.this, "" + a, Toast.LENGTH_SHORT).show();
-                    funeral = "";
-                    //isSunk();
-                }
+
                 gridView.setAdapter(adapter);
             }
         });
+    }
+    public void checkIfHit(int[] map, int position){
+        if (map[position] == 1 || map[position] == 0) {
+            map[position] = -3; // ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
+            if(isPlayer){
+                AI.AITurn(playerMap);
+            }
+        }else if (map[position] == 5){ //kuģis grimst
+            map[position] = -1;
+        }else {
+            boolean a = sinkingShip.isSunk(position,map);
+            Toast.makeText(MainActivity.this, "" + a, Toast.LENGTH_SHORT).show();
+            funeral = "";
+        }
     }
 
 
