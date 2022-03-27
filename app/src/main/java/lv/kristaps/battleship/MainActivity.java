@@ -2,6 +2,9 @@ package lv.kristaps.battleship;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     String computerScoreString = "Computer: ";
     String playerScoreString = "Player: ";
     String scoreString;
-    Button button, buttonPlayer, buttonCPU;
+    Button button, buttonPlayer, buttonCPU, buttonAlert;
     AI ai;
     Adapter adapter;
     SinkingShip sinkingShip;
@@ -63,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         button = (Button) findViewById(R.id.button);
         buttonPlayer = (Button) findViewById(R.id.buttonPlayer);
         buttonCPU = (Button) findViewById(R.id.buttonCPU);
+        buttonAlert = (Button) findViewById(R.id.buttonAlert);
         gridView = (GridView)findViewById(R.id.grid_view);
         ai = new AI();
         displayScore(playerScore, playerScoreString, playerScoreText);
@@ -71,12 +75,28 @@ public class MainActivity extends AppCompatActivity {
         Generator.generateMap(playerMap);
         Generator.populateMap(computerMap);
         Generator.generateMap(computerMap);
+        //alert = (Button)findViewById(R.id.btnAlert);
         buttonPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isPlayer = true;
                 adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
                 gridView.setAdapter(adapter);
+            }
+        });
+        buttonAlert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle("Instructions");
+                alertDialog.setMessage("The purpose of the game is to defeat your opponent's fleet before enemy destroyed your fleet. You can change the layout of your ships by pressing Randomize before the game starts. Attacks can be made by pressing on the playing field. You can take one shot on the opponent's playing field in one move. If the shot is accurate, it can be repeated, but if the shot is inaccurate, the move passes to the opponent's player.");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Okey",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which){
+                                dialog.dismiss();
+                        }
+                    });
+                alertDialog.show();
             }
         });
         buttonCPU.setOnClickListener(new View.OnClickListener() {
