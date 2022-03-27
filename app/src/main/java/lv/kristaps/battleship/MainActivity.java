@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ai.computerScore = 18;
+                ai.computerScore = 0;
                 playerScore = 0;
                 if (isPlayer){
                     displayScore(ai.computerScore, "Computer Score: ");

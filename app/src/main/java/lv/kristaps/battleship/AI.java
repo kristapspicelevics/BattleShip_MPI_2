@@ -6,7 +6,7 @@ public class AI {
 
     boolean isTurn = true;
     SinkingShip sinkingShip;
-    int computerScore = 18;
+    int computerScore = 0;
 
     public void AITurn(int[] map){
         int shipStartPos = 100;
