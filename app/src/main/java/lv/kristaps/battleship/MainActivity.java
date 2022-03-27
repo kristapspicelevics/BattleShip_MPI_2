@@ -201,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+
     public void sinkHorizontalShip(int position){
         boolean doContinue = true;
         int direction = 1;
