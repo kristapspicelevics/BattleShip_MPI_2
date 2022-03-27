@@ -57,7 +57,7 @@ public class Adapter extends BaseAdapter {
         } else {
             map = computerMap;
         }
-        if(didWin == true){
+        if(didWin == true || isPlayer == true){
             if ((map[position] >= -100 && map[position] <= 100)) {
                 return false;
             }

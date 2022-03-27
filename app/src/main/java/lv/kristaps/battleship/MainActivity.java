@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     String playerScoreString;
     String scoreString;
     Button button, buttonPlayer, buttonCPU;
+    AI ai;
     Adapter adapter;
     SinkingShip sinkingShip;
     int gridIndex;
@@ -78,12 +79,12 @@ public class MainActivity extends AppCompatActivity {
         buttonPlayer = (Button) findViewById(R.id.buttonPlayer);
         buttonCPU = (Button) findViewById(R.id.buttonCPU);
         gridView = (GridView)findViewById(R.id.grid_view);
-
+        ai = new AI();
         buttonPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isPlayer = true;
-                displayScore(playerScore, "Player Score: ");
+                displayScore(ai.computerScore, "Computer Score: ");
                 adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
                 gridView.setAdapter(adapter);
             }
@@ -92,7 +93,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 isPlayer = false;
-                displayScore(computerScore, "Computer Score: ");
+                displayScore(playerScore, "Player Score: ");
+
                 adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
                 gridView.setAdapter(adapter);
             }
@@ -100,10 +102,13 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                computerScore = 0;
+                ai.computerScore = 18;
                 playerScore = 0;
-                displayScore(playerScore, "Player Score: ");
-                displayScore(computerScore, "Computer Score: ");
+                if (isPlayer){
+                    displayScore(ai.computerScore, "Computer Score: ");
+                } else {
+                    displayScore(playerScore, "Player Score: ");
+                }
                 didWin = false;
                 Generator.populateMap(playerMap);
                 Generator.generateMap(playerMap);
@@ -122,73 +127,43 @@ public class MainActivity extends AppCompatActivity {
                     score = playerScore;
                 } else {
                     map = computerMap;
-                    score = computerScore;
+                    score = ai.computerScore;
                 }
                 Toast.makeText(MainActivity.this, "" + map[position], Toast.LENGTH_SHORT).show();
 
                 gridIndex = position;//saglabā to vērtību, kas ir pirms šaviena
-//
-                //VAJAG PADOT LĪDZI TO KEYVALUE KAUT KĀ, JO PATREIZ IR PIEEJAMS TIKAI TAS CIPARS, KAS IR
-                //ATTIECĪGAJĀ KVADRANTĀ
-
-                //-3 apzīmē aizšautu garām lauku
-                //-1 apzīmē nogrimušu kuģi
-                //99 apzīmē ievainotu kuģi
-//                if (map[position] == 1 || map[position] == 0) {
-//                    map[position] = -3; // ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
-//                }else if(map[position] == -1 || map[position] == 99 || map[position] == -3 ){ //šauj pa lauku, kuram jau ir trāpīts
-//                    //tad netiek netekas mainīts un atkārtoti var šaut, jo divreiz pa vienu un to pašu lauku nevar šaut
-//                }else if (map[position] == 5){ //kuģis grimst
-//                    map[position] = -1;
-//                }else {
-//                    map[position] = 99;
-//                    //isSunk();
-//                }
-//                switch (map[position]){
-//                    case 1:
-//                        gridIndex = map[position];//saglabā to vērtību, kas bija iepriekš
-//                        map[position] = -1;// ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
-//                        break;
-//                    case 45:
-//                        map[position] = 99;
-//                        break;
-//                    default:
-//                        //tad netiek netekas mainīts un atkārtoti var šaut, jo divreiz pa vienu un to pašu lauku nevar šaut
-//                }
-                if (map[position] == 1 || map[position] == 0) {
-                    map[position] = -3; // ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
-//                }else if(playerMap[position] == -1 || playerMap[position] == 99 || playerMap[position] == -3 ){ //šauj pa lauku, kuram jau ir trāpīts
-                    //tad netiek netekas mainīts un atkārtoti var šaut, jo divreiz pa vienu un to pašu lauku nevar šaut
-                }else if (map[position] == 5){ //kuģis grimst
-                    map[position] = -1;
-                    addScore(isPlayer);
-
-                }else {
-                    boolean a = SinkingShip.isSunk(position,map);
-                    Toast.makeText(MainActivity.this, "" + a, Toast.LENGTH_SHORT).show();
-                    funeral = "";
-                    addScore(isPlayer);
-                }
+                checkIfHit(map, position);
                 gridView.setAdapter(adapter);
             }
         });
     }
 
-    public void addScore(boolean isPlayer){
-        if (isPlayer){
+    public void checkIfHit(int[] map, int position){
+        if (map[position] == 1 || map[position] == 0) {
+            map[position] = -3; // ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
+            if(!isPlayer){
+                ai.AITurn(playerMap);
+            }
+        }else if (map[position] == 5){ //kuģis grimst
+            map[position] = -1;
+            addScore();
+        }else {
+            sinkingShip.isSunk(position,map);
+            addScore();
+        }
+        if(playerScore >= 20 || ai.computerScore >= 20){
+            didWin = true;
+            adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
+        }
+    }
+
+    public void addScore(){
+        if (!isPlayer){
             playerScore++;
             displayScore(playerScore, "Player Score: ");
-            if(playerScore >= 20){
-                didWin = true;
-                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
-            }
         } else {
-            computerScore++;
-            displayScore(computerScore, "Computer Score: ");
-            if(computerScore >= 20){
-                didWin = true;
-                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
-            }
+            System.out.println("Score "+ai.computerScore);
+            displayScore(ai.computerScore, "Computer Score: ");
         }
     }
 
