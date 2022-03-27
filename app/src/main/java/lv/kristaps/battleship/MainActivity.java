@@ -11,7 +11,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
-
+import android.os.Handler;
 
 public class MainActivity extends AppCompatActivity {
     GridView gridView;
@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     static int[] computerMap = new int [100];
     static int[] map = new int [100];
     String funeral = "";
+    Handler handler = new Handler();
     //static int[] mapIndex = new int [100];
     TextView playerScoreText;
     TextView cpuScoreText;
@@ -27,14 +28,18 @@ public class MainActivity extends AppCompatActivity {
     int score = 0;
     String computerScoreString = "Computer: ";
     String playerScoreString = "Player: ";
+    String win = "win";
+    String lose = "lose";
     String scoreString;
-    Button button, buttonPlayer, buttonCPU, buttonAlert;
+    Button buttonRandom, buttonStart, buttonAlert;
     AI ai;
     Adapter adapter;
     SinkingShip sinkingShip;
     int gridIndex;
     boolean isPlayer = true;
     boolean didWin = false;
+    MediaPlayer music;
+    MediaPlayer music1;
     int[] imageId = {
             R.drawable.blue, //0
             R.drawable.fire_in_water,
@@ -55,19 +60,14 @@ public class MainActivity extends AppCompatActivity {
             R.drawable.mina_dead,
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState){
-
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         playerScoreText = (TextView) findViewById(R.id.player);
         cpuScoreText = (TextView) findViewById(R.id.cpu);
-        button = (Button) findViewById(R.id.button);
-        buttonPlayer = (Button) findViewById(R.id.buttonPlayer);
-        buttonCPU = (Button) findViewById(R.id.buttonCPU);
+        buttonRandom = (Button) findViewById(R.id.buttonRandom);
+        buttonStart = (Button) findViewById(R.id.buttonStart);
         buttonAlert = (Button) findViewById(R.id.buttonAlert);
         gridView = (GridView)findViewById(R.id.grid_view);
         ai = new AI();
@@ -78,18 +78,9 @@ public class MainActivity extends AppCompatActivity {
         Generator.populateMap(computerMap);
         Generator.generateMap(computerMap);
         //alert = (Button)findViewById(R.id.btnAlert);
-        buttonPlayer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isPlayer = true;
-                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
-                gridView.setAdapter(adapter);
-            }
-        });
         buttonAlert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //music.start();
                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
                 alertDialog.setTitle("Instructions");
                 alertDialog.setMessage("The purpose of the game is to defeat your opponent's fleet before enemy destroyed your fleet. You can change the layout of your ships by pressing Randomize before the game starts. Attacks can be made by pressing on the playing field. You can take one shot on the opponent's playing field in one move. If the shot is accurate, it can be repeated, but if the shot is inaccurate, the move passes to the opponent's player.");
@@ -102,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                 alertDialog.show();
             }
         });
-        buttonCPU.setOnClickListener(new View.OnClickListener() {
+        buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isPlayer = false;
@@ -110,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
                 gridView.setAdapter(adapter);
             }
         });
-        button.setOnClickListener(new View.OnClickListener() {
+
+        buttonRandom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isPlayer = true;
@@ -125,12 +117,14 @@ public class MainActivity extends AppCompatActivity {
                 Generator.generateMap(computerMap);
                 adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
                 gridView.setAdapter(adapter);
+                buttonStart.setEnabled(true);
+                handler.removeCallbacksAndMessages(null);
             }
         });
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                buttonStart.setEnabled(false);
                 if (isPlayer){
                     map = playerMap;
                     score = playerScore;
@@ -139,44 +133,87 @@ public class MainActivity extends AppCompatActivity {
                     score = ai.computerScore;
                 }
             //    Toast.makeText(MainActivity.this, "" + map[position], Toast.LENGTH_SHORT).show();
-
-                gridIndex = position;//saglabā to vērtību, kas ir pirms šaviena
                 checkIfHit(map, position);
+                gridIndex = position;//saglabā to vērtību, kas ir pirms šaviena
                 gridView.setAdapter(adapter);
             }
         });
     }
 
     public void checkIfHit(int[] map, int position){
-        MediaPlayer music = MediaPlayer.create(MainActivity.this, R.raw.gunshot);
-        MediaPlayer music1 = MediaPlayer.create(MainActivity.this, R.raw.water);
+        music = MediaPlayer.create(MainActivity.this, R.raw.gunshot);
+        music1 = MediaPlayer.create(MainActivity.this, R.raw.water);
         if (map[position] == 1 || map[position] == 0) {
             map[position] = -3; // ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
             music1.start();//water
-            if(!isPlayer){
-                ai.AITurn(playerMap);
+            gridView.setEnabled(false);
+            if(!isPlayer) {
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        isPlayer = true;
+                        adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
+                        gridView.setAdapter(adapter);
+                        ai.AITurn(playerMap);
+                        displayScore(playerScore, playerScoreString, playerScoreText);
+                        displayScore(ai.computerScore, computerScoreString, cpuScoreText);
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                isPlayer = false;
+                                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
+                                gridView.setAdapter(adapter);
+                                displayScore(playerScore, playerScoreString, playerScoreText);
+                                displayScore(ai.computerScore, computerScoreString, cpuScoreText);
+                                gridView.setEnabled(true);
+                            }
+                        }, 3000);
+                    }
+                }, 2000);
             }
         }else if (map[position] == 5){ // trāpa mīnai
             map[position] = -1;
             playerScore++;
+            displayScore(playerScore, playerScoreString, playerScoreText);
+            displayScore(ai.computerScore, computerScoreString, cpuScoreText);
             music.start();//gun
         }else {
             sinkingShip.isSunk(position,map);
             playerScore++;
+            displayScore(playerScore, playerScoreString, playerScoreText);
+            displayScore(ai.computerScore, computerScoreString, cpuScoreText);
             music.start();//gun
+
         }
-        displayScore(playerScore, playerScoreString, playerScoreText);
-        displayScore(ai.computerScore, computerScoreString, cpuScoreText);
-        if(playerScore >= maxPoints || ai.computerScore >= maxPoints){
+        if (playerScore >= maxPoints){
+            result(win, ai.computerScore, playerScore);
+            didWin = true;
+            adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
+
+        }else if(ai.computerScore >= maxPoints){
+            result(lose, ai.computerScore, playerScore);
             didWin = true;
             adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
         }
     }
 
-
     public void displayScore(int score, String text, TextView scoreText){
         String scoreString = String.valueOf(score);
         scoreText.setText(text + scoreString);
+    }
+
+    public void result(String result, int pc, int player){
+        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+        alertDialog.setTitle("Game is over!");
+        alertDialog.setMessage("Congratulations, you " +result+ "!");
+        alertDialog.setMessage("Result was " +player+ ":"+ pc);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Okey",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which){
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 
 }
