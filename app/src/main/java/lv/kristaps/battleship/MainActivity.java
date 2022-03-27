@@ -19,7 +19,8 @@ public class MainActivity extends AppCompatActivity {
     static int[] computerMap = new int [100];
     static int[] map = new int [100];
     String funeral = "";
-    Handler handler = new Handler();
+    Handler handler = new Handler();;
+    Runnable runnable;
     //static int[] mapIndex = new int [100];
     TextView playerScoreText;
     TextView cpuScoreText;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     String win = "win";
     String lose = "lose";
     String scoreString;
-    Button buttonRandom, buttonStart, buttonAlert;
+    Button buttonRandom, buttonStart, buttonSurrender, buttonAlert;
     AI ai;
     Adapter adapter;
     SinkingShip sinkingShip;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         cpuScoreText = (TextView) findViewById(R.id.cpu);
         buttonRandom = (Button) findViewById(R.id.buttonRandom);
         buttonStart = (Button) findViewById(R.id.buttonStart);
+        buttonSurrender = (Button) findViewById(R.id.buttonSurrender);
         buttonAlert = (Button) findViewById(R.id.buttonAlert);
         gridView = (GridView)findViewById(R.id.grid_view);
         ai = new AI();
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Okey",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which){
-                                dialog.dismiss();
+                            dialog.dismiss();
                         }
                     });
                 alertDialog.show();
@@ -99,9 +101,18 @@ public class MainActivity extends AppCompatActivity {
                 isPlayer = false;
                 adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
                 gridView.setAdapter(adapter);
+                gridView.setEnabled(true);
             }
         });
 
+        buttonSurrender.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buttonStart.setEnabled(true);
+                buttonRandom.setEnabled(true);
+                handler.removeCallbacksAndMessages(null);
+            }
+        });
         buttonRandom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,13 +129,13 @@ public class MainActivity extends AppCompatActivity {
                 adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
                 gridView.setAdapter(adapter);
                 buttonStart.setEnabled(true);
-                handler.removeCallbacksAndMessages(null);
             }
         });
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 buttonStart.setEnabled(false);
+                buttonRandom.setEnabled(false);
                 if (isPlayer){
                     map = playerMap;
                     score = playerScore;
@@ -205,8 +216,7 @@ public class MainActivity extends AppCompatActivity {
     public void result(String result, int pc, int player){
         AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
         alertDialog.setTitle("Game is over!");
-        alertDialog.setMessage("Congratulations, you " +result+ "!");
-        alertDialog.setMessage("Result was " +player+ ":"+ pc);
+        alertDialog.setMessage("Congratulations, you " +result+ "!\n" + "Result was " +player+ ":"+ pc);
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Okey",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which){
