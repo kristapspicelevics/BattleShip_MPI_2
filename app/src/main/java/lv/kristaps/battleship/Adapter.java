@@ -15,13 +15,15 @@ public class Adapter extends BaseAdapter {
     private final int[] computerMap;
     private final int[] imageid;
     private final boolean isPlayer;
+    private final boolean didWin;
     private int[] map;
     // 1
-    public Adapter(Context context, int[] playerMap, int[] computerMap, int[] map, boolean isPlayer, int[] Imageid) {
+    public Adapter(Context context, int[] playerMap, int[] computerMap, int[] map, boolean isPlayer, boolean didWin, int[] Imageid) {
         this.mContext = context;
         this.playerMap = playerMap;
         this.computerMap = computerMap;
         this.isPlayer = isPlayer;
+        this.didWin = didWin;
         this.imageid = Imageid;
         this.map = map;
     }
@@ -49,20 +51,24 @@ public class Adapter extends BaseAdapter {
         return null;
     }
 
-    // 5
-
-
     public boolean isEnabled(int position) {
         if (isPlayer){
             map = playerMap;
         } else {
             map = computerMap;
         }
-        if (map[position] == -3 || map[position] == -1 || map[position] == 99) {
-            return false;
+        if(didWin == true){
+            if ((map[position] >= -100 && map[position] <= 100)) {
+                return false;
+            }
         } else {
-            return true;
+            if ((map[position] >= -8 && map[position] <= -1) || map[position] == 99 || map[position] == -45 || map[position] == -85) {
+                return false;
+            } else {
+                return true;
+            }
         }
+        return true;
     }
 
     @Override

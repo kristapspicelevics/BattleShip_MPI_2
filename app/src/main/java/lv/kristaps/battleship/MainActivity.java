@@ -19,12 +19,19 @@ public class MainActivity extends AppCompatActivity {
     static int[] map = new int [100];
     String funeral = "";
     //static int[] mapIndex = new int [100];
-    TextView text;
+    TextView scoreText;
+    int computerScore = 0;
+    int playerScore = 0;
+    int score = 0;
+    String computerScoreString;
+    String playerScoreString;
+    String scoreString;
     Button button, buttonPlayer, buttonCPU;
     Adapter adapter;
     SinkingShip sinkingShip;
     int gridIndex;
     boolean isPlayer = true;
+    boolean didWin = false;
     int[] imageId = {
             R.drawable.blue, //0
             R.drawable.fire_in_water,
@@ -66,16 +73,18 @@ public class MainActivity extends AppCompatActivity {
         Generator.generateMap(playerMap);
         Generator.populateMap(computerMap);
         Generator.generateMap(computerMap);
-        text = (TextView) findViewById(R.id.label);
+        scoreText = (TextView) findViewById(R.id.label);
         button = (Button) findViewById(R.id.button);
         buttonPlayer = (Button) findViewById(R.id.buttonPlayer);
         buttonCPU = (Button) findViewById(R.id.buttonCPU);
         gridView = (GridView)findViewById(R.id.grid_view);
+
         buttonPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isPlayer = true;
-                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, imageId);
+                displayScore(playerScore, "Player Score: ");
+                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
                 gridView.setAdapter(adapter);
             }
         });
@@ -83,28 +92,37 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 isPlayer = false;
-                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, imageId);
+                displayScore(computerScore, "Computer Score: ");
+                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
                 gridView.setAdapter(adapter);
             }
         });
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                computerScore = 0;
+                playerScore = 0;
+                displayScore(playerScore, "Player Score: ");
+                displayScore(computerScore, "Computer Score: ");
+                didWin = false;
                 Generator.populateMap(playerMap);
                 Generator.generateMap(playerMap);
                 Generator.populateMap(computerMap);
                 Generator.generateMap(computerMap);
-                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, imageId);
+                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
                 gridView.setAdapter(adapter);
             }
         });
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 if (isPlayer){
                     map = playerMap;
+                    score = playerScore;
                 } else {
                     map = computerMap;
+                    score = computerScore;
                 }
                 Toast.makeText(MainActivity.this, "" + map[position], Toast.LENGTH_SHORT).show();
 
@@ -143,16 +161,40 @@ public class MainActivity extends AppCompatActivity {
                     //tad netiek netekas mainīts un atkārtoti var šaut, jo divreiz pa vienu un to pašu lauku nevar šaut
                 }else if (map[position] == 5){ //kuģis grimst
                     map[position] = -1;
+                    addScore(isPlayer);
+
                 }else {
-                    boolean a = sinkingShip.isSunk(position,map);
+                    boolean a = SinkingShip.isSunk(position,map);
                     Toast.makeText(MainActivity.this, "" + a, Toast.LENGTH_SHORT).show();
                     funeral = "";
-                    //isSunk();
+                    addScore(isPlayer);
                 }
                 gridView.setAdapter(adapter);
             }
         });
     }
 
+    public void addScore(boolean isPlayer){
+        if (isPlayer){
+            playerScore++;
+            displayScore(playerScore, "Player Score: ");
+            if(playerScore >= 20){
+                didWin = true;
+                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
+            }
+        } else {
+            computerScore++;
+            displayScore(computerScore, "Computer Score: ");
+            if(computerScore >= 20){
+                didWin = true;
+                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
+            }
+        }
+    }
+
+    public void displayScore(int score, String text){
+        String scoreString = String.valueOf(score);
+        scoreText.setText(text + scoreString);
+    }
 
 }
