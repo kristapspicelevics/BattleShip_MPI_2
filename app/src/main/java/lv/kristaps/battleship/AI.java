@@ -8,12 +8,14 @@ public class AI {
     SinkingShip sinkingShip;
     int computerScore = 0;
     int hitStatus = 100;
+    boolean isVertical = false;
 
     public void AITurn(int[] map){
-        int position;
+        int position = hitStatus;
         while(isTurn){
             if(hitStatus != 100){ //ir trāpīts, bet nav zināms virziens
-                position = hitWounded(map, hitStatus);
+                if(isVertical) position = hitWoundedVertical(map, position);
+                else position = hitWounded(map, position);
             }
             else{
                 Random rand = new Random();
@@ -35,8 +37,11 @@ public class AI {
             map[position] = -1;
             computerScore++;
         }else {
-            hitStatus = position;
-            if(SinkingShip.isSunk(position,map)) hitStatus = 100;
+            if(hitStatus == 100) hitStatus = position;
+            if(SinkingShip.isSunk(position,map)) {
+                hitStatus = 100;
+                isVertical = false;
+            }
             computerScore++;
         }
     }
@@ -59,6 +64,7 @@ public class AI {
 
     public int hitWoundedVertical(int[] map, int position){
         int direction = 10;
+        isVertical = true;
         while(true){
             if (map[position] != 99) return position;
             if(direction == 10) {
