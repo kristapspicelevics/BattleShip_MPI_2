@@ -206,8 +206,7 @@ public class MainActivity extends AppCompatActivity {
                             public void run() {
                                 isPlayer = false;
                                 setGrid();
-//                                displayScore(playerScore, playerScoreString, playerScoreText);
-//                                displayScore(ai.computerScore, computerScoreString, cpuScoreText);
+                                displayScores();
                                 gridView.setEnabled(true);
                             }
                         }, delay + delay);
@@ -275,6 +274,12 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.quit:
                 finish();
+                return true;
+            case R.id.normalSpeed:
+                delay = 2000;
+                return true;
+            case R.id.doubleSpeed:
+                delay = 1000;
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

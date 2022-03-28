@@ -12,33 +12,18 @@ public class AI {
     int computerScore = 0;
     int hitStatus = 100;
     boolean isVertical = false;
-    int position;
+
 
     public void AITurn(int[] map, MediaPlayer music, MediaPlayer music1){
-        position = hitStatus;
+        int position = hitStatus;
         while(isTurn){
             if(hitStatus != 100){ //ir trāpīts, bet nav zināms virziens
                 if(isVertical) position = hitWoundedVertical(map, position);
                 else position = hitWounded(map, position);
-//                try {
-//                //    Thread.sleep(1500);
-//
-//                }
-//                catch(InterruptedException ex)  {
-//                    Thread.currentThread().interrupt();
-//                }
             }
             else{
                 Random rand = new Random();
                 position = rand.nextInt(100);
-//                try {
-//                //    Thread.sleep(1500);
-//
-//                }
-//                catch(InterruptedException ex)  {
-//                    Thread.currentThread().interrupt();
-//                }
-
             }
             if ((map[position] >= -8 && map[position] <= -1) || map[position] == 99 || map[position] == -45 || map[position] == -85){
                 continue; //šis ir lai score skaitītu

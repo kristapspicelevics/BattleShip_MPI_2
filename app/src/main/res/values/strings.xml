@@ -4,5 +4,7 @@
     <string name="start_game">Press on blue field and start destroying enemy fleet.</string>
     <string name="end">Game is over!</string>
     <string name="quit">Quit game</string>
+    <string name="normal_speed">Normal speed</string>
+    <string name="double_speed">Double speed</string>
 
 </resources>

@@ -3,9 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/normalSpeed"
+        android:title="@string/normal_speed" />
+
+    <item
+        android:id="@+id/doubleSpeed"
+        android:title="@string/double_speed" />
+
+    <item
         android:id="@+id/quit"
-        android:title="@string/quit"
-        app:showAsAction="ifRoom" />
+        android:title="@string/quit" />
 
 </menu>
 
