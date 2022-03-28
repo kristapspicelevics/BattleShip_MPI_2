@@ -3,6 +3,6 @@
     <string name="instruction">The purpose of the game is to defeat your opponents fleet before enemy destroyed your fleet. You can change the layout of your ships by pressing button Randomize. Attacks can be made by pressing on the blue playing field. You can take one shot on the opponents playing field in one move. If the shot is accurate, it can be repeated, but if the shot is inaccurate, the move passes to the opponents player. </string>
     <string name="start_game">Press on blue field and start destroying enemy fleet.</string>
     <string name="end">Game is over!</string>
-    <string name="quit_game">Quit game</string>
+    <string name="quit">Quit game</string>
 
 </resources>

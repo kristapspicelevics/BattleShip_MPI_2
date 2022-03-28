@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/quit"
-        android:title="@string/quit_game"
+        android:title="@string/quit"
         app:showAsAction="ifRoom" />
 
 </menu>
