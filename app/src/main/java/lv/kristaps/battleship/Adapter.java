@@ -78,6 +78,9 @@ public class Adapter extends BaseAdapter {
             mImageView = new ImageView(mContext);
             mImageView.setLayoutParams(new GridView.LayoutParams(110, 100));
             mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//            int padding_in_dp = 3;  // 6 dps
+//            final float scale = mContext.getResources().getDisplayMetrics().density;
+//            int padding_in_px = (int) (padding_in_dp * scale + 0.5f);
             mImageView.setPadding(0, 0, 0, 0);
         } else {
             mImageView = (ImageView) convertView;

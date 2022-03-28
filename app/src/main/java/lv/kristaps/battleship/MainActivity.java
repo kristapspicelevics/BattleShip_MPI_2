@@ -6,6 +6,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -19,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     static int[] computerMap = new int [100];
     static int[] map = new int [100];
     String funeral = "";
-    Handler handler = new Handler();;
+    Handler handler = new Handler();
     Runnable runnable;
     //static int[] mapIndex = new int [100];
     TextView playerScoreText;
@@ -27,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     int maxPoints = 20;
     int playerScore = 0;
     int score = 0;
+    int delay = 2000;
     String computerScoreString = "Computer: ";
     String playerScoreString = "Player: ";
     String win = "win";
@@ -74,12 +78,10 @@ public class MainActivity extends AppCompatActivity {
         buttonAlert = (Button) findViewById(R.id.buttonAlert);
         gridView = (GridView)findViewById(R.id.grid_view);
         ai = new AI();
-        displayScore(playerScore, playerScoreString, playerScoreText);
-        displayScore(ai.computerScore, computerScoreString, cpuScoreText);
-        Generator.populateMap(playerMap);
-        Generator.generateMap(playerMap);
-        Generator.populateMap(computerMap);
-        Generator.generateMap(computerMap);
+        displayScores();
+        generateMaps();
+        setGrid();
+        buttonSurrender.setEnabled(false);
         //alert = (Button)findViewById(R.id.btnAlert);
         buttonAlert.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ai.computerScore = 0;
+                playerScore = 0;
                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
                 alertDialog.setTitle("Let's start game!");
                 alertDialog.setMessage(getString(R.string.start_game));
@@ -110,8 +114,7 @@ public class MainActivity extends AppCompatActivity {
                         });
                 alertDialog.show();
                 isPlayer = false;
-                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
-                gridView.setAdapter(adapter);
+                setGrid();
                 gridView.setEnabled(true);
             }
         });
@@ -120,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 result(surrender, ai.computerScore, playerScore);
-                buttonStart.setEnabled(true);
+                buttonStart.setEnabled(false);
                 buttonRandom.setEnabled(true);
                 handler.removeCallbacksAndMessages(null);
             }
@@ -131,15 +134,10 @@ public class MainActivity extends AppCompatActivity {
                 isPlayer = true;
                 ai.computerScore = 0;
                 playerScore = 0;
-                displayScore(playerScore, playerScoreString, playerScoreText);
-                displayScore(ai.computerScore, computerScoreString, cpuScoreText);
                 didWin = false;
-                Generator.populateMap(playerMap);
-                Generator.generateMap(playerMap);
-                Generator.populateMap(computerMap);
-                Generator.generateMap(computerMap);
-                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
-                gridView.setAdapter(adapter);
+                displayScores();
+                generateMaps();
+                setGrid();
                 buttonStart.setEnabled(true);
             }
         });
@@ -148,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 buttonStart.setEnabled(false);
                 buttonRandom.setEnabled(false);
+                buttonSurrender.setEnabled(true);
                 if (isPlayer){
                     map = playerMap;
                     score = playerScore;
@@ -163,6 +162,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void setGrid(){
+        adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
+        gridView.setAdapter(adapter);
+    }
+
+    public void generateMaps() {
+        Generator.populateMap(playerMap);
+        Generator.generateMap(playerMap);
+        Generator.populateMap(computerMap);
+        Generator.generateMap(computerMap);
+    }
+
+    public void displayScores() {
+        displayScore(playerScore, playerScoreString, playerScoreText);
+        displayScore(ai.computerScore, computerScoreString, cpuScoreText);
+    }
+
     public void checkIfHit(int[] map, int position){
         music = MediaPlayer.create(MainActivity.this, R.raw.gunshot);
         music1 = MediaPlayer.create(MainActivity.this, R.raw.water);
@@ -175,48 +191,50 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         isPlayer = true;
-                        adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
-                        gridView.setAdapter(adapter);
-                        ai.AITurn(playerMap);
-                        displayScore(playerScore, playerScoreString, playerScoreText);
-                        displayScore(ai.computerScore, computerScoreString, cpuScoreText);
+                        setGrid();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                ai.AITurn(playerMap, music, music1);
+                                setGrid();
+                                displayScores();
+                            }
+                        }, delay);
+                        displayScores();
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 isPlayer = false;
-                                adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
-                                gridView.setAdapter(adapter);
-                                displayScore(playerScore, playerScoreString, playerScoreText);
-                                displayScore(ai.computerScore, computerScoreString, cpuScoreText);
+                                setGrid();
+//                                displayScore(playerScore, playerScoreString, playerScoreText);
+//                                displayScore(ai.computerScore, computerScoreString, cpuScoreText);
                                 gridView.setEnabled(true);
                             }
-                        }, 3000);
+                        }, delay + delay);
                     }
-                }, 2000);
+                }, delay);
             }
         }else if (map[position] == 5){ // trāpa mīnai
             map[position] = -1;
             playerScore++;
-            displayScore(playerScore, playerScoreString, playerScoreText);
-            displayScore(ai.computerScore, computerScoreString, cpuScoreText);
+            displayScores();
             music.start();//gun
         }else {
             sinkingShip.isSunk(position,map);
             playerScore++;
-            displayScore(playerScore, playerScoreString, playerScoreText);
-            displayScore(ai.computerScore, computerScoreString, cpuScoreText);
+            displayScores();
             music.start();//gun
 
         }
         if (playerScore >= maxPoints){
             result(win, ai.computerScore, playerScore);
             didWin = true;
-            adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
+            setGrid();
 
         }else if(ai.computerScore >= maxPoints){
             result(lose, ai.computerScore, playerScore);
             didWin = true;
-            adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
+            setGrid();
         }
     }
 
@@ -228,7 +246,11 @@ public class MainActivity extends AppCompatActivity {
     public void result(String result, int pc, int player){
         AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
         alertDialog.setTitle(getString(R.string.end));
-        alertDialog.setMessage("Congratulations, you " +result+ "!\n" + "Result was " +player+ ":"+ pc);
+        if (result.equals(win)) {
+            alertDialog.setMessage("Congratulations, you " +result+ "!\n" + "Result was " +player+ ":"+ pc);
+        } else {
+            alertDialog.setMessage("You " +result+ "!\n" + "Result was " +player+ ":"+ pc);
+        }
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Okey",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which){
@@ -236,8 +258,27 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         alertDialog.show();
-        buttonStart.setEnabled(true);
         buttonRandom.setEnabled(true);
+        buttonSurrender.setEnabled(false);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.quit:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 }

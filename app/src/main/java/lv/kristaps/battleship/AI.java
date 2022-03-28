@@ -1,5 +1,8 @@
 package lv.kristaps.battleship;
 
+import android.media.MediaPlayer;
+import android.os.Handler;
+
 import java.util.Random;
 
 public class AI {
@@ -9,31 +12,49 @@ public class AI {
     int computerScore = 0;
     int hitStatus = 100;
     boolean isVertical = false;
+    int position;
 
-    public void AITurn(int[] map){
-        int position = hitStatus;
+    public void AITurn(int[] map, MediaPlayer music, MediaPlayer music1){
+        position = hitStatus;
         while(isTurn){
             if(hitStatus != 100){ //ir trāpīts, bet nav zināms virziens
                 if(isVertical) position = hitWoundedVertical(map, position);
                 else position = hitWounded(map, position);
+//                try {
+//                //    Thread.sleep(1500);
+//
+//                }
+//                catch(InterruptedException ex)  {
+//                    Thread.currentThread().interrupt();
+//                }
             }
             else{
                 Random rand = new Random();
                 position = rand.nextInt(100);
+//                try {
+//                //    Thread.sleep(1500);
+//
+//                }
+//                catch(InterruptedException ex)  {
+//                    Thread.currentThread().interrupt();
+//                }
+
             }
             if ((map[position] >= -8 && map[position] <= -1) || map[position] == 99 || map[position] == -45 || map[position] == -85){
                 continue; //šis ir lai score skaitītu
             }
-            checkIfHit(map, position);
+            checkIfHit(map, position, music, music1);
         }
         isTurn = true;
     }
 
-    public void checkIfHit(int[] map, int position){
+    public void checkIfHit(int[] map, int position, MediaPlayer music, MediaPlayer music1){
         if (map[position] == 1 || map[position] == 0) {
             map[position] = -3; // ja ir 1 vai 0, tad tur bus garām aizsauts un būs udens
+            music1.start();
             isTurn = false;
         }else if (map[position] == 5){ //kuģis grimst
+            music.start();
             map[position] = -1;
             computerScore++;
         }else {
@@ -43,6 +64,7 @@ public class AI {
                 isVertical = false;
             }
             computerScore++;
+            music.start();
         }
     }
 
