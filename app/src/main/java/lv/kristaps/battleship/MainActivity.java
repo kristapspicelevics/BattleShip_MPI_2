@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     String playerScoreString = "Player: ";
     String win = "win";
     String lose = "lose";
+    String surrender= "surrender";
     String scoreString;
     Button buttonRandom, buttonStart, buttonSurrender, buttonAlert;
     AI ai;
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
                 alertDialog.setTitle("Instructions");
-                alertDialog.setMessage("The purpose of the game is to defeat your opponent's fleet before enemy destroyed your fleet. You can change the layout of your ships by pressing Randomize before the game starts. Attacks can be made by pressing on the playing field. You can take one shot on the opponent's playing field in one move. If the shot is accurate, it can be repeated, but if the shot is inaccurate, the move passes to the opponent's player.");
+                alertDialog.setMessage(getString(R.string.instruction));
                 alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Okey",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which){
@@ -98,6 +99,16 @@ public class MainActivity extends AppCompatActivity {
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle("Let's start game!");
+                alertDialog.setMessage(getString(R.string.start_game));
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Okey",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which){
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
                 isPlayer = false;
                 adapter = new Adapter(MainActivity.this, playerMap, computerMap, map, isPlayer, didWin, imageId);
                 gridView.setAdapter(adapter);
@@ -108,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         buttonSurrender.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                result(surrender, ai.computerScore, playerScore);
                 buttonStart.setEnabled(true);
                 buttonRandom.setEnabled(true);
                 handler.removeCallbacksAndMessages(null);
@@ -215,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void result(String result, int pc, int player){
         AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-        alertDialog.setTitle("Game is over!");
+        alertDialog.setTitle(getString(R.string.end));
         alertDialog.setMessage("Congratulations, you " +result+ "!\n" + "Result was " +player+ ":"+ pc);
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Okey",
                 new DialogInterface.OnClickListener() {
