@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.os.Handler;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     GridView gridView;
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 isPlayer = false;
                 setGrid();
                 gridView.setEnabled(true);
+                Toast.makeText(MainActivity.this, "Player Attack", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -192,6 +194,8 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         isPlayer = true;
                         setGrid();
+                        displayScores();
+                        Toast.makeText(MainActivity.this, "Computer Attack", Toast.LENGTH_SHORT).show();
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -206,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
                             public void run() {
                                 isPlayer = false;
                                 setGrid();
+                                Toast.makeText(MainActivity.this, "Player Attack", Toast.LENGTH_SHORT).show();
                                 displayScores();
                                 gridView.setEnabled(true);
                             }
